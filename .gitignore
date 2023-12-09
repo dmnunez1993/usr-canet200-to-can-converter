@@ -1,0 +1,6 @@
+.DS_Store
+
+# Env files
+.env
+
+config.yaml

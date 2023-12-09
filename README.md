@@ -15,4 +15,4 @@ In order to start developing, you need to run the following in the root of the r
 
 Then, to run the app:
 
-    go run cmd/usr_canet_to_can_converter.go
+    go run cmd/usr_canet_to_can_converter/usr_canet_to_can_converter.go
