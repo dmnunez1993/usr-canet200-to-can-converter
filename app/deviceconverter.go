@@ -143,9 +143,10 @@ func (dc *UsrCanetDeviceConverter) run() {
 		}
 
 		wg := &sync.WaitGroup{}
-		wg.Add(1)
+		wg.Add(2)
 
 		go dc.netToCan(wg)
+		go dc.canToNet(wg)
 
 		wg.Wait()
 
@@ -194,6 +195,67 @@ func (dc *UsrCanetDeviceConverter) netToCan(wg *sync.WaitGroup) {
 		dc.mux.Unlock()
 
 		_, err = canConn.Send(msg)
+
+		if err != nil {
+			log.Error(err.Error())
+			dc.closeConn()
+			return
+		}
+	}
+}
+
+func (dc *UsrCanetDeviceConverter) canToNet(wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	for !dc.isStopped() {
+		dc.mux.Lock()
+		canConn := dc.canConn
+		dc.mux.Unlock()
+
+		msg, err := canConn.Recv()
+
+		if err != nil {
+			log.Error(err.Error())
+			dc.closeConn()
+			return
+		}
+
+		// Set the length of the package
+		frameInfo := byte(len(msg.Data))
+
+		if msg.Kind == canbus.RTR {
+			// Setting bit 6 of the frame info word indicates a RTR message
+			frameInfo = frameInfo | 0x6
+		}
+
+		if msg.Kind == canbus.EFF {
+			// Setting bit 7 of the frame info word indicates an EFF message
+			frameInfo = frameInfo | 0x7
+		}
+
+		frameId := make([]byte, 4)
+
+		// Split ID into bytes
+		frameId[0] = byte(msg.ID >> 24 & 0xFF)
+		frameId[1] = byte(msg.ID >> 16 & 0xFF)
+		frameId[2] = byte(msg.ID >> 8 & 0xFF)
+		frameId[3] = byte(msg.ID & 0xFF)
+
+		payload := msg.Data
+
+		netPackage := make([]byte, 13)
+		// Add frame info
+		netPackage[0] = frameInfo
+		// Add frame id
+		copy(netPackage[1:5], frameId)
+		// Add payload
+		copy(netPackage[6:], payload)
+
+		dc.mux.Lock()
+		netConn := dc.netConn
+		dc.mux.Unlock()
+
+		_, err = netConn.Write(netPackage)
 
 		if err != nil {
 			log.Error(err.Error())
