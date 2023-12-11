@@ -1,0 +1,4 @@
+device_converters: 
+  - host: "127.0.0.1"
+    port: 20002
+    target: "vcan0"
