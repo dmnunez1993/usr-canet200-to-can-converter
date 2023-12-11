@@ -1,6 +1,7 @@
 package usrcanettocan
 
 import (
+	"fmt"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -61,8 +62,9 @@ func GetOrCreateConverterConfig() (UsrCanetConverterConfig, error) {
 	config, err := GetConverterConfig()
 
 	if err != nil {
-		config := UsrCanetConverterConfig{}
-		err = config.Save()
+		fmt.Println(err)
+		//config := UsrCanetConverterConfig{}
+		//err = config.Save()
 	}
 
 	return config, err
