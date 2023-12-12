@@ -1,4 +1,8 @@
+# Mac OS
 .DS_Store
+
+# VsCode
+.vscode
 
 # Env files
 .env

@@ -9,13 +9,13 @@ import (
 const defaultConfigPath = "./config.yaml"
 
 type UsrCanetDeviceConverterConfig struct {
-	Host   string `yaml:"host"`
-	Port   int64  `yaml:"port"`
-	Target string `yaml:"target"`
+	Host   string `yaml:"host" json:"host"`
+	Port   int64  `yaml:"port" json:"port"`
+	Target string `yaml:"target" json:"target"`
 }
 
 type UsrCanetConverterConfig struct {
-	DeviceConverters []UsrCanetDeviceConverterConfig `yaml:"device_converters"`
+	DeviceConverters []UsrCanetDeviceConverterConfig `yaml:"device_converters" json:"deviceConverters"`
 }
 
 func getConfigPath() string {

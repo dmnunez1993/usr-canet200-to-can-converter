@@ -63,7 +63,7 @@ func (c *UsrCanetConverter) updateDeviceConverters() {
 	}
 }
 
-func (c *UsrCanetConverter) run() {
+func (c *UsrCanetConverter) Run() {
 	for {
 		c.updateDeviceConverters()
 		time.Sleep(time.Second * 5)
@@ -73,8 +73,6 @@ func (c *UsrCanetConverter) run() {
 func NewUsrCanetConverter() *UsrCanetConverter {
 	c := UsrCanetConverter{}
 	c.deviceConverters = make(map[deviceConverterKey]*UsrCanetDeviceConverter)
-
-	go c.run()
 
 	return &c
 }
