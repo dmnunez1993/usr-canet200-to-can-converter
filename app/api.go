@@ -23,7 +23,7 @@ type errorResponse struct {
 
 type configSuccessResponse struct {
 	Status string                  `json:"status"`
-	Config UsrCanetConverterConfig `json:"config"`
+	Config UsrCanetConverterConfig `json:"data"`
 }
 
 func writeError(statusCode int, err error, res http.ResponseWriter, req *http.Request) {
@@ -108,8 +108,9 @@ func ServeRestApi() {
 	setRestApiRoutes(r.PathPrefix("/").Subrouter())
 
 	c := cors.New(cors.Options{
-		AllowedOrigins: getAllowedOrigins(),
-		Debug:          getDebugLvl() == log.DebugLevel,
+		AllowedOrigins:   getAllowedOrigins(),
+		AllowCredentials: true,
+		Debug:            getDebugLvl() == log.DebugLevel,
 	})
 	c.Log = logging.New(NewLogWriter(), "[cors]", logging.LstdFlags)
 

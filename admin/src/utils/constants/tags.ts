@@ -1,0 +1,9 @@
+export const SUCCESS = "success";
+export const FAILED = "failed";
+export const ERROR = "error";
+export const WARNING = "warning";
+export const INFO = "info";
+export const UNKNOWN = "unknown";
+export const ACCEPTED = "accepted";
+export const PUT = "PUT";
+export const NOT_FOUND = "not_found";
