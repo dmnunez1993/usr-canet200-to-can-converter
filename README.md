@@ -5,21 +5,22 @@ Converts USR Canet 200 data to standard can packaging format. Only works on Linu
 ### Dependencies
 
 - [golang](https://go.dev/) - Version 1.21.5
+- [NodeJS](https://nodejs.org) - Version 21.0.0
 - [python3](https://www.python.org/)
 - [can-utils](https://github.com/linux-can/can-utils)
 
 ### Start developing
 
-To launch a test USR Canet 200 server, you can use the following command in the root of the repository:
+To launch a test USR Canet 200 server, run in the root of the repository:
 
     ./utils/replay_usr_canet200_data_to_tcp.py test_data/can_data_usr_canet200_3.json
 
 For development purposes, it is possible to use the vcan kernel module:
-    
+
     sudo modprobe vcan
     sudo ip link add dev vcan0 type vcan
 
-In order to start developing, you need to run the following in the root of the repository:
+In order to start developing, run the following in the root of the repository:
 
     cd app
     go mod download
@@ -35,3 +36,12 @@ Then, to run the app:
 To visualize the output on the simulated vcan0 port:
 
     candump vcan0
+
+To install the dependencies for the admin interface, run the following in the root of the repository:
+
+    cd admin
+    yarn install
+
+Then, to start the admin interfase:
+
+    yarn start
