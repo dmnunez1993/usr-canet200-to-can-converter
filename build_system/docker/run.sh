@@ -23,5 +23,4 @@ docker run \
   -v ${OUTPUT_FOLDER}:/output \
   -w /usr-canet200-to-can-converter \
   --user ${USER_ID}:${USER_ID} \
-  -it --rm $IMAGE bash
-  # -it --rm $IMAGE bash -c "./build_system/deb_${TARGET}/scripts/build_installer.sh"
+  -it --rm $IMAGE bash -c "./build_system/deb_${TARGET}/scripts/build_installer.sh"
