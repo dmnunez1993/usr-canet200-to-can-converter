@@ -18,6 +18,7 @@ case "$1" in
         setup_environment
         ;;
     *)
+        systemctl stop usr_canet200_to_can_converter
+        systemctl disable usr_canet200_to_can_converter
         ;;
 esac
-
