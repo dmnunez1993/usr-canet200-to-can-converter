@@ -48,12 +48,12 @@ func (h frontendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)
 }
 
-func Serve() {
+func ServeAdmin() {
 	router := mux.NewRouter()
 
 	fh := frontendHandler{staticPath: getFrontendPath(), indexPath: "index.html"}
 	router.PathPrefix("/").Handler(fh)
-	log.Info("Initializing HTTP Frontend server...")
+	log.Info("Initializing HTTP Admin server...")
 
 	loggingHandler := LoggingHTTPHandler(fh)
 

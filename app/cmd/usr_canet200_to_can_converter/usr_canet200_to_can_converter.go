@@ -22,6 +22,7 @@ func main() {
 	go converter.Run()
 
 	go usrcanettocan.ServeRestApi()
+	go usrcanettocan.ServeAdmin()
 
 	usrcanettocan.LoopForever()
 }
