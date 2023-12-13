@@ -6,8 +6,9 @@ HOME=~/.usr_canet_converter_build_system_home
 CODE_DIR=$(git rev-parse --show-toplevel)
 USER_ID=$UID
 USER_NAME=$USER
-OUTPUT_FOLDER=$1
-TARGET=$2
+
+TARGET=$1
+OUTPUT_FOLDER=$2
 
 mkdir -p ~/.usr_canet_converter_build_system
 mkdir -p ~/.usr_canet_converter_build_system/go

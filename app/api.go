@@ -2,10 +2,12 @@ package usrcanettocan
 
 import (
 	"encoding/json"
+	"fmt"
 	logging "log"
 	"net/http"
 	"os"
-	"strings"
+	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
@@ -81,25 +83,26 @@ func setConverterConfig(res http.ResponseWriter, req *http.Request) {
 	writeConfigSuccess(newConfig, res, req)
 }
 
-func getAllowedOrigins() []string {
-	allowedOrigins, found := os.LookupEnv("ALLOWED_ORIGINS")
-
-	if !found {
-		allowedOrigins = "http://localhost:3000,http://localhost:9102"
-	}
-
-	s := strings.Split(allowedOrigins, ",")
-
-	if len(s) == 0 || (len(s) == 1 && s[0] == "") {
-		s = append(s, "http://localhost:3000")
-	}
-
-	return s
-}
-
 func setRestApiRoutes(r *mux.Router) {
 	r.HandleFunc("/get_config/", http.HandlerFunc(getConverterConfig)).Methods("GET")
 	r.HandleFunc("/set_config/", http.HandlerFunc(setConverterConfig)).Methods("POST")
+}
+
+func getApiPort() int {
+	var apiPort int
+	apiPort = 9401
+
+	apiPortFronEnvStr, ok := os.LookupEnv("API_PORT")
+
+	if ok {
+		apiPortFromEnv, err := strconv.Atoi(apiPortFronEnvStr)
+
+		if err != nil {
+			apiPort = apiPortFromEnv
+		}
+	}
+
+	return apiPort
 }
 
 func ServeRestApi() {
@@ -108,7 +111,8 @@ func ServeRestApi() {
 	setRestApiRoutes(r.PathPrefix("/").Subrouter())
 
 	c := cors.New(cors.Options{
-		AllowedOrigins:   getAllowedOrigins(),
+		// Allow all origins since the app is to be runned locally
+		AllowOriginFunc:  func(origin string) bool { return true },
 		AllowCredentials: true,
 		Debug:            getDebugLvl() == log.DebugLevel,
 	})
@@ -120,8 +124,10 @@ func ServeRestApi() {
 	loggingHandler := LoggingHTTPHandler(handler)
 
 	srv := &http.Server{
-		Handler: loggingHandler,
-		Addr:    "0.0.0.0:9401",
+		Handler:      loggingHandler,
+		Addr:         fmt.Sprintf("0.0.0.0:%d", getApiPort()),
+		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  15 * time.Second,
 	}
 	srv.ListenAndServe()
 }

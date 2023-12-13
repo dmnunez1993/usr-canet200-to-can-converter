@@ -1,9 +1,11 @@
 package usrcanettocan
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -11,8 +13,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func getFrontendPath() string {
-	frontendPath, found := os.LookupEnv("FRONTEND_PATH")
+func getAdminPath() string {
+	frontendPath, found := os.LookupEnv("ADMIN_PATH")
 
 	if !found {
 		wd, _ := os.Getwd()
@@ -48,10 +50,31 @@ func (h frontendHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	http.FileServer(http.Dir(h.staticPath)).ServeHTTP(w, r)
 }
 
+func getAdminPort() int {
+	var adminPort int
+	adminPort = 9402
+
+	adminPortFromEnvStr, ok := os.LookupEnv("ADMIN_PORT")
+
+	if ok {
+		apiPortFromEnv, err := strconv.Atoi(adminPortFromEnvStr)
+
+		if err != nil {
+			adminPort = apiPortFromEnv
+		}
+	}
+
+	return adminPort
+}
+
 func ServeAdmin() {
 	router := mux.NewRouter()
 
-	fh := frontendHandler{staticPath: getFrontendPath(), indexPath: "index.html"}
+	adminPath := getAdminPath()
+
+	log.Info(fmt.Sprintf("Serving admin from %s", adminPath))
+
+	fh := frontendHandler{staticPath: getAdminPath(), indexPath: "index.html"}
 	router.PathPrefix("/").Handler(fh)
 	log.Info("Initializing HTTP Admin server...")
 
@@ -59,7 +82,7 @@ func ServeAdmin() {
 
 	srv := &http.Server{
 		Handler:      loggingHandler,
-		Addr:         "0.0.0.0:9402",
+		Addr:         fmt.Sprintf("0.0.0.0:%d", getAdminPort()),
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}

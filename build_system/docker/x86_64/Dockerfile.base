@@ -1,8 +1,13 @@
-FROM ubuntu:18.04
+FROM ubuntu:22.04
 
-RUN apt-get update
-RUN apt-get install -y sudo
-RUN apt-get install -y build-essential wget gcc-arm-linux-gnueabi git
+RUN apt-get update && apt-get install -y build-essential wget git curl rsync
+
+RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_21.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
+
+RUN apt-get update && apt-get install -y nodejs
+
+RUN npm install -g create-react-app yarn
 
 RUN mkdir /go_installers
 WORKDIR /go_installers

@@ -50,7 +50,7 @@ const DeviceConfigForm: React.FC<DeviceConfigFormProps> = ({
       onChange(newItem);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [editingItem]
   );
 
   const onDeleteClick = useCallback(() => {

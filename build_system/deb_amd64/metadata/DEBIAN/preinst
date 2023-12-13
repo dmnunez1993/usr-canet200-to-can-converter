@@ -10,8 +10,6 @@ setup_environment() {
 
     chown -R $USERNAME:$UERNAME /var/usr_canet200_to_can_converter
 
-    rm /etc/nginx/sites-enabled/default
-
     adduser $USERNAME $USERNAME
 }
 
