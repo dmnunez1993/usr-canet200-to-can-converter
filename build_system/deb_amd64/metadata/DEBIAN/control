@@ -1,0 +1,5 @@
+Package: usr-canet200-to-can-converter
+Version: 0.0.1-1
+Architecture: amd64
+Maintainer: Diego Maldonado dmnunez1993@gmail.com
+Description: Usr Canet 200 to Can Converter

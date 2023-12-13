@@ -1,0 +1,13 @@
+[Unit]
+Description=<description about this service>
+
+[Service]
+User=usr_canet200_converter
+WorkingDirectory=/usr/local/usr_canet200_to_can_converter
+ExecStart=usr_canet200_to_can_converter
+Restart=always
+RestartSec=3
+Environment="CONFIG_PATH=/var/usr_canet200_to_can_converter/config.yaml"
+
+[Install]
+WantedBy=multi-user.target
