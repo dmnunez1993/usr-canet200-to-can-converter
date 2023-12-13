@@ -130,6 +130,13 @@ const ConfigForm: React.FC = () => {
 
   return (
     <fieldset disabled={submitting} className="mt-2">
+      <Row className="mb-2">
+        <Col>
+          <h2 style={{ textAlign: "center" }}>
+            Configuración de Conversor Usr Canet 200 a Can
+          </h2>
+        </Col>
+      </Row>
       {devices.map((device, _) => (
         <Row className="mb-1" key={device.uuid}>
           <Col>

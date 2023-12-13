@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+setup_environment() {
+    USERNAME="usr_canet200_converter"
+
+    adduser --system $USERNAME --no-create-home
+    groupadd $USERNAME
+
+    mkdir -p /var/usr_canet200_to_can_converter/logs
+
+    chown -R $USERNAME:$UERNAME /var/usr_canet200_to_can_converter
+
+    adduser $USERNAME $USERNAME
+}
+
+case "$1" in
+    install)
+        setup_environment
+        ;;
+    *)
+        systemctl stop usr_canet200_to_can_converter
+        systemctl disable usr_canet200_to_can_converter
+        ;;
+esac

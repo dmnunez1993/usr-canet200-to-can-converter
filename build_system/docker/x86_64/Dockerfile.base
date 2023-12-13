@@ -1,0 +1,19 @@
+FROM ubuntu:22.04
+
+RUN apt-get update && apt-get install -y build-essential wget git curl rsync
+
+RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+RUN echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_21.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
+
+RUN apt-get update && apt-get install -y nodejs
+
+RUN npm install -g create-react-app yarn
+
+RUN mkdir /go_installers
+WORKDIR /go_installers
+RUN wget https://dl.google.com/go/go1.21.5.linux-amd64.tar.gz
+RUN tar -C /usr/local -xzf go1.21.5.linux-amd64.tar.gz
+
+WORKDIR /
+
+ENV PATH="${PATH}:/usr/local/go/bin"

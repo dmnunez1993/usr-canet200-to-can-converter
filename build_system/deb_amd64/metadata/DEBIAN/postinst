@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+USERNAME="usr_canet200_converter"
+
+
+mkdir -p /var/usr_canet200_to_can_converter/logs
+chown -R $USERNAME:$UERNAME /var/usr_canet200_to_can_converter
+
+ln -s /usr/local/usr_canet200_to_can_converter/usr_canet200_to_can_converter /usr/local/bin/usr_canet200_to_can_converter
+
+systemctl enable usr_canet200_to_can_converter
+systemctl start usr_canet200_to_can_converter

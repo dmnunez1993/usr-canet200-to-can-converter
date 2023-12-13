@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+clear_symlinks()    {
+    rm /usr/local/bin/usr_canet200_to_can_converter
+}
+
+clear_environment() {
+    USERNAME="usr_canet200_converter"
+
+    groupdel $USERNAME
+    userdel $USERNAME
+}
+
+clear_symlinks
+
+case "$1" in
+     remove)
+        clear_environment
+        ;;
+    *)
+        ;;
+esac

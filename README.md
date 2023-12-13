@@ -8,6 +8,7 @@ Converts USR Canet 200 data to standard can packaging format. Only works on Linu
 - [NodeJS](https://nodejs.org) - Version 21.0.0
 - [python3](https://www.python.org/)
 - [can-utils](https://github.com/linux-can/can-utils)
+- [docker](https://www.docker.com/) - Used to create .deb packages
 
 ### Start developing
 
@@ -45,3 +46,17 @@ To install the dependencies for the admin interface, run the following in the ro
 Then, to start the admin interfase:
 
     yarn start
+
+### Create a .deb installer
+
+To create a .deb installer for the project, make sure you have docker installed.
+
+First, build the image:
+
+    cd build_system/docker
+    ./build.sh
+
+To create the .deb:
+
+    cd build_system/
+    ./build_deb_amd64.sh /path/to/desired/output/folder # Replace with desired output folder path
