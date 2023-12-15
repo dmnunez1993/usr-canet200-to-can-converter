@@ -43,9 +43,11 @@ To install the dependencies for the admin interface, run the following in the ro
     cd admin
     yarn install
 
-Then, to start the admin interfase:
+Then, to start the admin interface:
 
     yarn start
+
+The admin should be visible at http://localhost:3000
 
 ### Create a .deb installer
 
@@ -60,3 +62,5 @@ To create the .deb:
 
     cd build_system/
     ./build_deb_amd64.sh /path/to/desired/output/folder # Replace with desired output folder path
+
+In the case of this installer, the admin interface is running at port 9402.
