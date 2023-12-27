@@ -38,11 +38,22 @@ func (dc *UsrCanetDeviceConverter) isStopped() bool {
 	return dc.stopped
 }
 
-func (dc *UsrCanetDeviceConverter) isConnOpen() bool {
+func (dc *UsrCanetDeviceConverter) isNetConnOpen() bool {
 	dc.mux.Lock()
 	defer dc.mux.Unlock()
 
-	return dc.netConnOpen && dc.canConnOpen
+	return dc.netConnOpen
+}
+
+func (dc *UsrCanetDeviceConverter) isCanConnOpen() bool {
+	dc.mux.Lock()
+	defer dc.mux.Unlock()
+
+	return dc.canConnOpen
+}
+
+func (dc *UsrCanetDeviceConverter) isConnOpen() bool {
+	return dc.isNetConnOpen() && dc.isCanConnOpen()
 }
 
 func (dc *UsrCanetDeviceConverter) stop() bool {
@@ -55,7 +66,7 @@ func (dc *UsrCanetDeviceConverter) stop() bool {
 	return dc.stopped
 }
 
-func (dc *UsrCanetDeviceConverter) initializeConn() bool {
+func (dc *UsrCanetDeviceConverter) initializeNetConn() bool {
 	dc.mux.Lock()
 	defer dc.mux.Unlock()
 	d := net.Dialer{Timeout: 5 * time.Second}
@@ -84,12 +95,21 @@ func (dc *UsrCanetDeviceConverter) initializeConn() bool {
 	dc.netConn = conn
 	dc.netConnOpen = true
 
-	dc.canConn, err = canbus.New()
+	return true
+}
+
+func (dc *UsrCanetDeviceConverter) initializeCanConn() bool {
+	dc.mux.Lock()
+	defer dc.mux.Unlock()
+
+	canConn, err := canbus.New()
 
 	if err != nil {
 		log.Error(err.Error())
 		return false
 	}
+
+	dc.canConn = canConn
 
 	err = dc.canConn.Bind(dc.config.Target)
 
@@ -104,7 +124,14 @@ func (dc *UsrCanetDeviceConverter) initializeConn() bool {
 
 	dc.canConnOpen = true
 
-	return dc.netConnOpen && dc.canConnOpen
+	return true
+}
+
+func (dc *UsrCanetDeviceConverter) initializeConn() bool {
+	netConnected := dc.initializeNetConn()
+	canConnected := dc.initializeCanConn()
+
+	return netConnected && canConnected
 }
 
 func (dc *UsrCanetDeviceConverter) closeConn() {
@@ -125,7 +152,11 @@ func (dc *UsrCanetDeviceConverter) closeConn() {
 	)
 
 	if dc.canConnOpen {
-		dc.canConn.Close()
+		err := dc.canConn.Close()
+
+		if err != nil {
+			log.Error(err.Error())
+		}
 		dc.canConnOpen = false
 	}
 }
@@ -143,10 +174,11 @@ func (dc *UsrCanetDeviceConverter) run() {
 		}
 
 		wg := &sync.WaitGroup{}
-		wg.Add(2)
+		wg.Add(1)
 
 		go dc.netToCan(wg)
-		go dc.canToNet(wg)
+		// TODO: fix situations where CAN port fail
+		go dc.canToNet()
 
 		wg.Wait()
 
@@ -204,9 +236,7 @@ func (dc *UsrCanetDeviceConverter) netToCan(wg *sync.WaitGroup) {
 	}
 }
 
-func (dc *UsrCanetDeviceConverter) canToNet(wg *sync.WaitGroup) {
-	defer wg.Done()
-
+func (dc *UsrCanetDeviceConverter) canToNet() {
 	for !dc.isStopped() {
 		dc.mux.Lock()
 		canConn := dc.canConn
@@ -225,12 +255,12 @@ func (dc *UsrCanetDeviceConverter) canToNet(wg *sync.WaitGroup) {
 
 		if msg.Kind == canbus.RTR {
 			// Setting bit 6 of the frame info word indicates a RTR message
-			frameInfo = frameInfo | 0x6
+			frameInfo = frameInfo | 1<<6
 		}
 
 		if msg.Kind == canbus.EFF {
 			// Setting bit 7 of the frame info word indicates an EFF message
-			frameInfo = frameInfo | 0x7
+			frameInfo = frameInfo | 1<<7
 		}
 
 		frameId := make([]byte, 4)
@@ -249,7 +279,7 @@ func (dc *UsrCanetDeviceConverter) canToNet(wg *sync.WaitGroup) {
 		// Add frame id
 		copy(netPackage[1:5], frameId)
 		// Add payload
-		copy(netPackage[6:], payload)
+		copy(netPackage[5:], payload)
 
 		dc.mux.Lock()
 		netConn := dc.netConn
